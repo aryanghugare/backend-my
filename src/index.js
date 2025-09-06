@@ -20,6 +20,7 @@ const app = express();
     try {
         await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
         console.log("Connected Succesfully")
+// Here we are listening for the event of error
         app.on("error", (error) => {
             console.log("EROR:", error);
             throw error;
@@ -98,12 +99,31 @@ const app = express();
 
     },
 */
+// Now the script in package.json is changed 
 
 import dotenv from "dotenv";
 dotenv.config();
-
+import express from "express";
+const app = express();
 import mongoose from "mongoose";
 import { DB_NAME } from "./constants.js";
 import connectDB from "./db/index.js";
-
+// This connectDB will return a promise 
+// So for that , .then and .catch is used 
 connectDB()
+    .then(() => {
+        // Start the server 
+        app.listen(process.env.PORT || 8000, () => {
+                console.log(`The Server is running on the port ${process.env.PORT}`);
+
+            })
+            // Listening for the event of error 
+        app.on("error", (error) => {
+            console.log("EROR:", error);
+            throw error;
+        });
+    })
+    .catch((error) => {
+        console.log("MONGO_DB Connection Failed ", error);
+
+    })
