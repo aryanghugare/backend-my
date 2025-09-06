@@ -1,6 +1,8 @@
 // mongoose is used to connect the database 
 // Wrap the database responses in try catch , so to handle it perfectly 
 
+/*
+// My code 
 import mongoose from "mongoose";
 import { DB_NAME } from "./constants.js";
 import express from "express"
@@ -12,6 +14,8 @@ const app = express();
 // we can also use normal function and then normally call them 
 // it wiil be the same as Immediately Invoked Function Expression)
 // DB connection code 
+
+
 (async() => {
     try {
         await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
@@ -37,8 +41,13 @@ const app = express();
 
 
 
+*/
+// Chatgpt code 
+// In this method , we are connecting the database in this index.js file itself 
+// In the 2nd Method , we will be connecting through different file 
+// will be keeping connection code different 
 
-
+// This is chatgpt connected code for the first method 
 // 1st way to do mongoDb connection 
 // import mongoose from "mongoose";
 // import { DB_NAME } from "./constants.js";
@@ -70,3 +79,31 @@ const app = express();
 //         throw error;
 //     }
 // })();
+
+
+
+
+
+
+
+
+
+
+// This is the second method importing connectDB() from db folder index.js 
+// This second  method  without changing the script in package.json 
+// Script for this approach 
+/*"scripts": {
+
+        "dev": "nodemon src/index.js"
+
+    },
+*/
+
+import dotenv from "dotenv";
+dotenv.config();
+
+import mongoose from "mongoose";
+import { DB_NAME } from "./constants.js";
+import connectDB from "./db/index.js";
+
+connectDB()
