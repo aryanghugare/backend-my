@@ -46,5 +46,5 @@ Designed as a **scalable, distributed backend project**, PlayGrid focuses on per
 
 1. **Clone the repository**  
    ```bash
-   git clone https://github.com/your-username/playgrid.git
+   git clone https://github.com/aryanghugare/PlayGrid.git
    cd playgrid
