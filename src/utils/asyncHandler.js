@@ -1,14 +1,15 @@
 // This is the first way of the wrapper function 
-
-const aysncHandler = (requestHandler) => {
+// This is used for controller 
+// Just makes our controller code less repeatitive 
+// Higher Order Function 
+const asyncHandler = (requestHandler) => {
     return (req, res, next) => {
-        Promise.resolve(requestHandler(req, res, next)).
-        catch((error) => next(error))
+        Promise.resolve(requestHandler(req, res, next)).catch((error) => next(error))
     }
 
 }
 
-export { aysncHandler }
+export { asyncHandler }
 
 
 

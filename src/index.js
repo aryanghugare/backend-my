@@ -100,11 +100,12 @@ const app = express();
     },
 */
 // Now the script in package.json is changed 
-
+// here 
 import dotenv from "dotenv";
 dotenv.config();
-import express from "express";
-const app = express();
+// import express from "express"; // done in start of the project
+// const app = express(); // done in start of the project
+import { app } from './app.js'; // This line is important to load all the routes 
 import mongoose from "mongoose";
 import { DB_NAME } from "./constants.js";
 import connectDB from "./db/index.js";
@@ -127,3 +128,6 @@ connectDB()
         console.log("MONGO_DB Connection Failed ", error);
 
     })
+
+
+// Index.js is mostly kept cleaned
