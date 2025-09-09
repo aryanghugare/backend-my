@@ -4,7 +4,7 @@ class ApiResponse {
         this.data = data
         this.message = message
         this.success = statusCode < 400
-            // <400 because it is a success 
+        // <400 because it is a success 
 
     }
 }
@@ -17,3 +17,6 @@ class ApiResponse {
 // Use 422
 // for validation errors, 400
 // for generic bad requests.
+
+
+export { ApiResponse }

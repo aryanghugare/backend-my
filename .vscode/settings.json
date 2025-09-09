@@ -1,0 +1,19 @@
+{
+  "editor.parameterHints.enabled": true,
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  "editor.suggestOnTriggerCharacters": false,
+  "editor.acceptSuggestionOnEnter": "off",
+  "editor.hover.enabled": true,
+  "editor.lightbulb.enabled": "off",
+  "editor.codeActionsOnSave": {},
+  "editor.inlineSuggest.enabled": false,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+
+
+

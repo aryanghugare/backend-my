@@ -10,21 +10,24 @@ cloudinary.config({
 });
 
 // Method to upload files on cloudinary 
-const uploadOnCloudinary = async(localFilePath) => {
+const uploadOnCloudinary = async (localFilePath) => {
     try {
         if (!localFilePath) return null
-            // upload the file on cloudinary 
+        // upload the file on cloudinary 
         const response = await cloudinary.uploader.upload(localFilePath, {
             // All the cloudinary options 
             // Docs available on cloudinary website 
             resource_type: 'auto'
         })
-        console.log("File has been uploaded successfully", response.url)
+        ///  console.log("File has been uploaded successfully", response.url)
+        // Here we have uploaded the images or files succesfully on the cloudinary 
+        // Now we will use fs.unlinkSync() to remove these images from local storage after uploading that's why using fs.unlinkSync()
+        fs.unlinkSync(localFilePath)
         return response;
     } catch (error) {
         // If there is any error , we should delete this file from local server 
         fs.unlinkSync(localFilePath) // remove the locally saved temprorary file as 
-            // the upload operation got failed 
+        // the upload operation got failed 
         return null;
     }
 }

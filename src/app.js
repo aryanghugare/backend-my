@@ -1,22 +1,22 @@
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-
 const app = express()
-    // app.use() is the middleware 
-    // To handle the cross origin resource sharing 
+// app.use() is the middleware 
+// To handle the cross origin resource sharing 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
-        // many options to explore 
+    // many options to explore 
 }))
 
 // To handle all type of data 
 // To accept the json files 
 // To set the limit for json reponses 
 app.use(express.json({ limit: "20kb" }))
-    // To handle the URL 
+// To handle the URL 
 app.use(express.urlencoded())
+// app.use(express.urlencoded({ extended: true }));
 
 // To handle the public assets , which i want to store in my system 
 // express.static() is built-in middleware in Express.
@@ -36,8 +36,8 @@ import userRouter from './routes/user.routes.js'
 //what we are doing is , whenever a user enters "/users"
 // The controll will go to the  'userRouter'
 app.use("/api/v1/users", userRouter)
-    // so we have created till here 
-    // after that controll is passed to userRouter in file user.routes.js
-    // http://localhost:8000/api/v1/users/ 
+// so we have created till here 
+// after that controll is passed to userRouter in file user.routes.js
+// http://localhost:8000/api/v1/users/ 
 
 export { app };

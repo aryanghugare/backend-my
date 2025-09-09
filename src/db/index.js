@@ -6,11 +6,12 @@ import dotenv from "dotenv";
 dotenv.config();
 const app = express();
 
-const connectDB = async() => {
+const connectDB = async () => {
     try {
         const connectionInstance = await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
-            // Through mongoose.connect , there is object returned of connection 
-        console.log("Connected Succesfully", connectionInstance.connection)
+        // Through mongoose.connect , there is object returned of connection 
+        //  console.log("Connected Succesfully", connectionInstance.connection)
+        console.log("Connected Succesfully")
 
 
     } catch (error) {

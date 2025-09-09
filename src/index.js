@@ -115,10 +115,10 @@ connectDB()
     .then(() => {
         // Start the server 
         app.listen(process.env.PORT || 8000, () => {
-                console.log(`The Server is running on the port ${process.env.PORT}`);
+            console.log(`The Server is running on the port ${process.env.PORT}`);
 
-            })
-            // Listening for the event of error 
+        })
+        // Listening for the event of error 
         app.on("error", (error) => {
             console.log("EROR:", error);
             throw error;
