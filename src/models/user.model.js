@@ -64,6 +64,7 @@ const userSchema = new Schema(
 // Here callback function is not arrow function because 
 // arrow function does not has 'this' reference 
 // Therefore normal function is used here 
+// .pre() is the middleware also called as hooks 
 userSchema.pre('save', async function (next) {
 
     if (this.isModified("password")) { // This if loop is because , when there will be changes in password or password is enter the first time  , then only the following hook of encrypting password is used 
