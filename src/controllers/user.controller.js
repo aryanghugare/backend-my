@@ -3,8 +3,15 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponses.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
-import jwt from "jsonwebtoken"
+import { deletefromCloudinary } from "../utils/deleteCloudinary.js";
+import jwt from "jsonwebtoken";
+// if you are updating some files like coverImage , avatar keep thier end points different 
+// By diiferent i mean , there routes will be different 
+//router.route("/avatar")
+//router.route("/cover-image") 
+// This is Because , let's say user wants to update its coverImage ,
+// if you put it inside route like login , the whole other data goes with it which is  not optimal 
+
 
 // So here we will be not using asyncHandler because ...
 // We are not dealing with any route request in this method 
@@ -44,8 +51,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
     const { fullName, email, username, password } = req.body // the data coming from form and json of frontend is catch by req.body 
-    console.log(req.body);
-    console.log(req.files);
+    // console.log(req.body);
+    // console.log(req.files);
 
 
     // console.log("email", email);
@@ -89,6 +96,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
     // we dont have any checks for coverImage is there or not 
+    // because adding the cover image is not necessary for our use case for this application 
     // So for that 
 
     let coverImageLocalPath;
@@ -340,9 +348,224 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 
 })
+
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+    try {
+        const { newPassword, oldPassword } = req.body;
+        // We can also add something like confirm password (optional)
+        if (!oldPassword || !newPassword) {
+            throw new ApiError(420, "Both old and new password are required");
+        }
+        const same = await bcrypt.compare(newPassword, oldPassword)
+        if (same) return new ApiError(415, "New and old Password cannot be same ")
+        // So here the thing , we will use the middleware of auth.middleware.js , in the user.routes
+        // soo after this req will have req.user 
+        const user = await User.findById(req.user?._id)
+        const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+        if (!isPasswordCorrect) {
+            throw new ApiError(400, "Invalid old Password ")
+        }
+
+        user.password = newPassword
+        await user.save({ validateBeforeSave: false })
+        // what is happenning here is , we have a pre hook for User schema, where there is save operation it checks 
+        // whether the password is entered first time or whether the password is changed , in this cases 
+        // User schema encrypts the new password which is plain text using bcrypt and stores it 
+        return res.status(200)
+            .json(new ApiResponse(200, "Password changed Successfully "))
+
+
+    } catch (error) {
+        throw new ApiError(412, "There was some error while changing the password ")
+    }
+
+
+
+})
+
+const getcurrentUser = asyncHandler(async (req, res) => {
+
+    const current = req.user
+
+    return res.status(200)
+        .json(new ApiResponse(202, current, "You have the current user context "))
+
+})
+
+// This is the method to update the fullname and email  
+// We can update anything which we want 
+
+// This will throw error 
+
+// Actually after testing , it is not throwing error 
+const updateAccountDetails1 = asyncHandler(async (req, res) => {
+    const { fullname, email } = req.body
+    if (!fullname || !email) {
+        throw new ApiError(400, "All fields are required")
+    }
+    const user = await User.findByIdAndUpdate(req.user._id,
+        { // $set can also be used here 
+            fullName: fullname,  // fullName is the field in the database 
+            email: email
+        },
+        { new: true }
+
+    ).select("-password") // This is used to dont include the password in this response 
+    return res.status(200)
+        .json(new ApiResponse(202, user, "Account Details updated Successfully  "))
+
+});
+
+
+
+// Second method to update account details 
+
+const updateAccountDetails2 = asyncHandler(async (req, res) => {
+    const { fullname, email } = req.body;
+    if (!fullname || !email) {
+        throw new ApiError(400, "All fields are required");
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { $set: { fullname, email } },
+        { new: true, runValidators: true, select: "-password" } // exclude password
+    );
+
+    return res.status(200).json(
+        new ApiResponse(200, user, "Account Details updated Successfully")
+    );
+});
+
+
+const updateUserAvatar = asyncHandler(async (req, res) => {
+    const avatarpath = req.file.path;
+    const prevAvatar = req.user.avatar; // this is variable of previous avatar in the databsse 
+
+    if (!avatarpath) {
+        new ApiError(402, "Avatar not present in the local storage or not given properly  ")
+    }
+    const avatarcloud = await uploadOnCloudinary(avatarpath);
+    if (!avatarcloud.url) {
+        throw new ApiError(402, "Error while uploading file on cloudinary ")
+    }
+
+
+    // so the assignment is 
+    // as i am updating the user avatar , we will be deleting the old avatar image from cloudinary 
+
+
+    // This method of getting the publicId from url is chatGpt generated 
+    function getPublicIdFromUrl(prevAvatar) {
+        const parts = prevAvatar.split("/");
+        const fileWithExt = parts.pop(); // e.g. "stlewelcy9ampkfq5tpy.jpg"
+
+        // Check if previous part is a version ("v12345")
+        if (parts[parts.length - 1].startsWith("v")) {
+            parts.pop(); // remove version
+        }
+
+        const publicId = fileWithExt.split(".")[0]; // remove extension
+        return parts.slice(parts.indexOf("upload") + 1).join("/") + publicId;
+    }
+
+    const publicId = getPublicIdFromUrl(prevAvatar)
+
+    const done = await deletefromCloudinary(publicId);
+
+    if (!done) throw new ApiError(405, "Image Deletion is not done ")
+
+
+    // Here , I am updating the databse with the new url 
+    // I just did, try catch for safety purpose , not needed 
+    try {
+        const user = await User.findByIdAndUpdate(req.user._id, {
+
+            avatar: avatarcloud.url
+        },
+            {
+                new: true,
+            }
+        )
+            .select("-password")
+
+        return res
+            .status(200)
+            .json(new ApiResponse(202, user, "The Avatar is updated successfully "))
+
+    }
+    catch (error) {
+        throw new ApiError(454, "Error While updating the avatar")
+
+    }
+
+})
+
+
+
+
+const updateUserCoverImage = asyncHandler(async (req, res) => {
+    const coverImageLocalPath = req.file?.path
+    const prevcoverImage = req.user.coverImage;
+
+    if (!coverImageLocalPath) {
+        throw new ApiError(400, "Cover image file is missing")
+    }
+
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+
+    if (!coverImage.url) {
+        throw new ApiError(400, "Error while uploading on avatar")
+
+    }
+
+
+
+    function getPublicIdFromUrl(prevCoverImage) {
+        const parts = prevCoverImage.split("/");
+        const fileWithExt = parts.pop(); // e.g. "stlewelcy9ampkfq5tpy.jpg"
+
+        // Check if previous part is a version ("v12345")
+        if (parts[parts.length - 1].startsWith("v")) {
+            parts.pop(); // remove version
+        }
+
+        const publicId = fileWithExt.split(".")[0]; // remove extension
+        return parts.slice(parts.indexOf("upload") + 1).join("/") + publicId;
+    }
+
+    const publicId = getPublicIdFromUrl(prevcoverImage)
+    const done = await deletefromCloudinary(publicId);
+
+    if (!done) throw new ApiError(405, "Image Deletion is not done ")
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                coverImage: coverImage.url
+            }
+        },
+        { new: true }
+    ).select("-password")
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, user, "Cover image updated successfully")
+        )
+})
+
+
+
 export {
     registerUser,
     loginUser,
     logOutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    changeCurrentPassword,
+    getcurrentUser,
+    updateAccountDetails1,
+    updateUserAvatar,
+    updateUserCoverImage
 }
