@@ -40,6 +40,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 // Here , the default route , which is chai and code gave 
 const getUserTweets = asyncHandler(async (req, res) => {
     const userId = req.params;
+    //  here  we can also do  the destructring like const{userId} = req.params
     console.log("This is the log hihi ", userId.userId);
 
 

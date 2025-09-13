@@ -31,6 +31,7 @@ app.use(cookieParser())
 // routes import 
 import userRouter from './routes/user.routes.js'
 import tweetRouter from './routes/tweet.routes.js'
+import subscriptionRouter from './routes/subscription.routes.js'
 
 // routes declaration 
 // Through this middleware 
@@ -38,6 +39,7 @@ import tweetRouter from './routes/tweet.routes.js'
 // The controll will go to the  'userRouter'
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/tweet", tweetRouter)
+app.use("/api/v1/subscriptions", subscriptionRouter)
 // so we have created till here 
 // after that controll is passed to userRouter in file user.routes.js
 // http://localhost:8000/api/v1/users/ 

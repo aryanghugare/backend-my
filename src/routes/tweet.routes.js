@@ -7,6 +7,7 @@ router.use(verifyJWT) // Applying verifyJWT middleware to all routes in this fil
 router.route("/").post(createTweet);
 //router.route("/tweets").get(getUserTweets);
 router.route("/user/:userId").get(getUserTweets);
+// If there is no destructing in the controller , while declaring 
 // req.params.userId = whatever the value of userId is there in the route 
 // router.route("/update").patch();
 
@@ -17,6 +18,7 @@ router.route("/user/:userId").get(getUserTweets);
 // The HTTP method decides the action, not the route path.
 // RESTful APIs use the same URL for a resource, and different verbs for actions.
 router.route("/:tweetId").patch(updateTweet).delete(deleteTweet);
+// If there is no destructing in the controller , while declaring 
 // so here req.params.tweetId = whatever the value of tweetId is there in the route 
 
 export default router;
