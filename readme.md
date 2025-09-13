@@ -32,14 +32,9 @@ Designed as a **scalable, distributed backend project**, PlayGrid focuses on per
 ## 🛠️ Tech Stack
 
 - **Backend Framework**: Node.js (Express.js)  
-- **Database**: MongoDB / PostgreSQL (for video metadata & user data)  
-- **Storage**: AWS S3 / GridFS for video storage  
-- **Streaming**: HLS / DASH protocol for video delivery  
+- **Database**: MongoDB  
+- **Storage**:   
 - **Authentication**: JWT & OAuth 2.0  
-- **Caching**: Redis for sessions & frequently accessed data  
-- **Message Queue**: Kafka / RabbitMQ for async tasks (video processing)  
-- **Containerization**: Docker for deployment  
-
 ---
 
 ## ⚙️ Installation & Setup
