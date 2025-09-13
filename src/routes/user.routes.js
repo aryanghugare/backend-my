@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
     loginUser, registerUser, logOutUser, refreshAccessToken, updateAccountDetails1
-    , changeCurrentPassword, updateUserAvatar, getcurrentUser, updateUserCoverImage
+    , changeCurrentPassword, updateUserAvatar, getcurrentUser, updateUserCoverImage, getUserChannelProfile
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -33,5 +33,6 @@ router.route("/current-user").get(verifyJWT, getcurrentUser)
 router.route("/avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar)
 router.route("/cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage)
 // So for update-avatar , change-password ,update details we need user login to be compulsory  that's why different middlewares like verifyJWT , upload(multer) are used 
+router.route("/c/:username").get(verifyJWT, getUserChannelProfile)
 
 export default router;

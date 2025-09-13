@@ -556,7 +556,104 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
         )
 })
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params
+    if (!username?.trim()) {
+        throw new ApiError(402, "username is missing")
+    }
 
+    // After agggregation pipelines , the response data is of arrays 
+    const channel = await User.aggregate([
+        {
+            $match: {
+                username: username?.toLowerCase()
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "channel",
+                as: "subscribers"
+
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "subscriber",
+                as: "subscribedTo"
+            }
+        },
+        {
+            $addFields: {
+                subscribersCount: {
+                    $size: "$subscribers"
+                },
+                channelSubscribedToCount: {
+                    $size: "$subscribedTo"
+
+                },
+                isSubscribed: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$subscribers.subscriber "] }, // $in looks for the condition in both arrays and object 
+                        then: true,
+                        else: false
+                    }
+                }
+
+
+            }
+        },
+        {
+            $project: {
+                fullName: 1,
+                username: 1,
+                subscribersCount: 1,
+                channelSubscribedToCount: 1,
+                isSubscribed: 1,
+                avatar: 1,
+                email: 1,
+                coverImage: 1,
+
+            }
+        }
+
+    ])
+    if (channel?.length) throw new ApiError(404, "Channel not found")
+
+    console.log(channel);
+
+
+    return res.status(200)
+        .json(
+            new ApiResponse(202, channel[0], "User channel profile fetched successfully ")
+        )
+
+})
+
+
+const getWatchHistory = asyncHandler(async (req, res) => {
+    const user = User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id) // Here the thing we can use to get the actual mongoDb Id (3:21:00 Backend Part 2)
+            }
+
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+
+            }
+        }
+    ])
+
+})
 
 export {
     registerUser,
@@ -567,5 +664,6 @@ export {
     getcurrentUser,
     updateAccountDetails1,
     updateUserAvatar,
-    updateUserCoverImage
+    updateUserCoverImage,
+    getUserChannelProfile
 }

@@ -30,12 +30,14 @@ app.use(cookieParser())
 
 // routes import 
 import userRouter from './routes/user.routes.js'
+import tweetRouter from './routes/tweet.routes.js'
 
 // routes declaration 
 // Through this middleware 
 //what we are doing is , whenever a user enters "/users"
 // The controll will go to the  'userRouter'
 app.use("/api/v1/users", userRouter)
+app.use("/api/v1/tweet", tweetRouter)
 // so we have created till here 
 // after that controll is passed to userRouter in file user.routes.js
 // http://localhost:8000/api/v1/users/ 
