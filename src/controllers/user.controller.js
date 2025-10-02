@@ -126,7 +126,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // Create the entry on the database 
     // await is used because while storing , there can be error from the database 
-    // Also remember the database is always in different contintent 
+    // Also remember the database is always in different continent 
     const user = await User.create({
         fullName,
         avatar: avatar.url,
@@ -146,7 +146,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
     if (!createdUser) {
-        throw new ApiError(447, "User has not been created on database ")
+        throw new ApiError(503, "User has not been created on database ")
     }
 
     // return new ApiResponse(200, createdUser, "User has been created successfully").    this is wrong 
@@ -310,7 +310,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     // Get refresh token from cookies (browser) OR body (mobile/API)
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
     if (!incomingRefreshToken) {
-        throw new ApiError(401, "Refresh token required");
+        throw new ApiError(401, "UnAuthorized request - No refresh token");
     }
     try {
 
@@ -328,15 +328,15 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 
         // Generate new access token 
-        const { accessToken, newrefreshToken } = await generateAccessAndRefereshTokens(user._id)
-        return res
+        const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
+            return res
             .status(200)
             .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", newrefreshToken, options)
+            .cookie("refreshToken", refreshToken, options)
             .json(new ApiResponse(200,
 
                 {
-                    accessToken, refreshToken: newrefreshToken
+                    accessToken, refreshToken
                 },
                 "Access Token refresh successfully "
 
@@ -356,8 +356,11 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
         if (!oldPassword || !newPassword) {
             throw new ApiError(420, "Both old and new password are required");
         }
-        const same = await bcrypt.compare(newPassword, oldPassword)
-        if (same) return new ApiError(415, "New and old Password cannot be same ")
+        // const same = await bcrypt.compare(newPassword, oldPassword)
+        // if (same) return new ApiError(415, "New and old Password cannot be same ")
+        if (newPassword === oldPassword) {
+        throw new ApiError(415, "New and old Password cannot be same")
+        }
         // So here the thing , we will use the middleware of auth.middleware.js , in the user.routes
         // soo after this req will have req.user 
         const user = await User.findById(req.user?._id)
@@ -502,7 +505,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 })
 
 
-
+// When there will be file uploads , have thier end points different
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
     const coverImageLocalPath = req.file?.path
@@ -665,5 +668,6 @@ export {
     updateAccountDetails1,
     updateUserAvatar,
     updateUserCoverImage,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory
 }

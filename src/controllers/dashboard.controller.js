@@ -9,13 +9,13 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 
 const getChannelStats = asyncHandler(async (req, res) => {
     // Total Subscribers 
-    const channelId = req.user._id;
-    Subscription.aggregate([
-        {
-            $match: { channel: mongoose.Types.ObjectId(channelId) }
-        },
-        {}
+    const { channelId } = req.params;
+   const totalSubscribers = await Subscription.countDocuments({ channel: channelId });
+// total Videos
+const totalVideos = await Video.countDocuments({owner : channelId})
 
-    ])
+    res.status(200).json(new ApiResponse(200, "Channel stats fetched successfully", { subscribers : totalSubscribers, videos : totalVideos }));
+
+
 })
 

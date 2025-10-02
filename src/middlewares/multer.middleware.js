@@ -18,3 +18,21 @@ const storage = multer.diskStorage({
 export const upload = multer({
     storage
 })
+
+
+
+// The complete flow of file uploads in this project 
+
+/*
+Frontend → sends file via form/API
+Multer → saves file locally (public/temp/avatar-123.jpg)
+Your Controller → calls uploadOnCloudinary(req.file.path)
+Cloudinary → uploads file to cloud, returns URL
+Cleanup → local file deleted via fs.unlinkSync()
+Database → save Cloudinary URL in user profile
+
+
+*/
+
+
+// This is achieved using two files multer.middleware.js and cloudinary.js 

@@ -15,6 +15,7 @@ const app = express();
 // it wiil be the same as Immediately Invoked Function Expression)
 // DB connection code 
 
+// This is the first way to connect to the DB , here we write all the connection logic in index.js itself
 
 (async() => {
     try {

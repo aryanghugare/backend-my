@@ -11,7 +11,7 @@ const connectDB = async () => {
         const connectionInstance = await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
         // Through mongoose.connect , there is object returned of connection 
         //  console.log("Connected Succesfully", connectionInstance.connection)
-        console.log("Connected Succesfully")
+        console.log("Connected Succesfully database")
 
 
     } catch (error) {

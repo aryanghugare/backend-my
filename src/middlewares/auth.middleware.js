@@ -25,7 +25,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
         }
         const decodedToken = jwt.verify(Token, process.env.ACCESS_TOKEN_SECRET)
 
-        const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
+        const user = await User.findById(decodedToken?._id).select("-password -refreshToken")  // while making the methods of refresh Token and access Token in user.model.js , we have added _id in the payload which is the unique id of the user in the database
         if (!user) throw new ApiError(404, "Invalid Acces Token")
         req.user = user;
         next()

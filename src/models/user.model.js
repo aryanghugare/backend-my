@@ -79,10 +79,11 @@ userSchema.pre('save', async function (next) {
     }
 
 })
-
+// These are the custom methods which i have created 
 // This is the method to validate the password 
 userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
+    // it returns true or false 
 }
 // No need for async 
 userSchema.methods.generateAccessToken = function () {
